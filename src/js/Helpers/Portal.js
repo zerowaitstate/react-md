@@ -1,7 +1,7 @@
 import React, { PureComponent, PropTypes } from 'react';
 import {
+  render,
   unmountComponentAtNode as unmount,
-  unstable_renderSubtreeIntoContainer as render,
 } from 'react-dom';
 
 /**
@@ -66,7 +66,6 @@ export default class Portal extends PureComponent {
     this._portal = null;
     this._container = null;
 
-    this._applyStyles = this._applyStyles.bind(this);
     this._renderPortal = this._renderPortal.bind(this);
     this._removePortal = this._removePortal.bind(this);
   }
@@ -99,28 +98,21 @@ export default class Portal extends PureComponent {
     this._removePortal();
   }
 
-  _applyStyles(props) {
-    if (props.className) {
-      this._container.className = props.className;
-    }
-  }
-
   _renderPortal(props) {
     if (!this._container) {
       this._container = document.createElement(props.component);
 
-      this._applyStyles(props);
       const node = (props.renderNode || document.body);
       if (props.lastChild) {
         node.appendChild(this._container);
       } else {
         node.insertBefore(this._container, node.firstChild);
       }
-    } else {
-      this._applyStyles(props);
     }
 
-    this._portal = render(this, props.children, this._container);
+    const { children } = props;
+
+    render(children, this._container);
   }
 
   _removePortal() {
@@ -133,7 +125,6 @@ export default class Portal extends PureComponent {
       (this.props.renderNode || document.body).removeChild(this._container);
     }
 
-    this._portal = null;
     this._container = null;
   }
 
