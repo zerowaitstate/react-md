@@ -18,7 +18,8 @@
     "lint:scripts": "eslint -c .eslintrc src",
     "lint": "npm run lint:styles && npm run lint:scripts",
     "lint:fix": "eslint -c .eslintrc --fix src",
-    "css-bundles": "node ./makeBundles.js",
+    "ts-defs": "babel-node --presets=es2015,react --plugins=syntax-async-functions,transform-regenerator ./src/scripts/makeTSDefs.js",
+    "css-bundles": "node ./src/scripts/makeBundles.js",
     "build:umd": "npm run css-bundles && webpack --progress --colors",
     "prebuild": "rimraf lib && rimraf dist && rimraf src/scss/bundles && npm run lint",
     "build": "npm run scripts && npm run build:umd"
@@ -53,6 +54,7 @@
     "babel-preset-react": "^6.11.1",
     "babel-preset-stage-0": "^6.5.0",
     "cross-env": "^3.1.4",
+    "bluebird": "^3.4.7",
     "css-loader": "^0.25.0",
     "eslint": "^3.3.1",
     "eslint-config-airbnb": "^12.0.0",
@@ -69,9 +71,11 @@
     "react-addons-test-utils": "^15.3.x",
     "react-addons-transition-group": "^15.3.x",
     "react-dom": "^15.3.x",
+    "react-to-typescript-definitions": "^0.18.1",
     "rimraf": "^2.5.4",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
+    "typescript": "^2.1.5",
     "webpack": "^1.13.1"
   },
   "dependencies": {
