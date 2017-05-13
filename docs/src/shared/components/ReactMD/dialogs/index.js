@@ -5,8 +5,14 @@ import ModalDialogExamples from './ModalDialogExamples';
 import ModalDialogExamplesRaw from '!!raw!./ModalDialogExamples';
 import FullPageDialogExamples from './FullPageDialogExamples';
 import FullPageDialogExamplesRaw from '!!raw!./FullPageDialogExamples';
+import FullPageExample2 from './FullPageExample2';
+import FullPageExample2Raw from '!!raw!./FullPageExample2';
 
 export default [{
+  title: '',
+  code: FullPageExample2Raw,
+  children: <FullPageExample2 />,
+}, {
   title: 'Simple Dialog Examples',
   description: `
 A \`Simple Dialog\` will be rendered if there are no actions given

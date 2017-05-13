@@ -12,6 +12,19 @@ $md-ink-enter-transition-time: .45s !default;
 /// @type Number
 $md-ink-leave-transition-time: .3s !default;
 
+/// The min scale for the ink when pulsing.
+/// @type Number
+$md-ink-min-scale: .85 !default;
+
+/// The max scale for the ink when focused or pulsing.
+/// @type Number
+$md-ink-max-scale: .9 !default;
+
+///
+/// Boolean if the ink should pulse while being focused.
+/// @type Boolean
+$md-ink-pulse: false !default;
+
 /// The animation time for the ink's pulsing.
 /// @type Number
 $md-ink-pulse-time: 1.5s !default;
@@ -60,34 +73,36 @@ $md-ink-pulse-time: 1.5s !default;
   }
 
   .md-ink--expanded {
-    transform: scale(.9);
+    transform: scale($md-ink-max-scale);
   }
 
-  .md-ink--pulsing {
-    animation-duration: $md-ink-pulse-time;
-    animation-iteration-count: infinite;
-    animation-name: md-ink-pulse;
-    animation-timing-function: $md-transition-standard;
+  @if $md-ink-pulse {
+    .md-ink--pulsing {
+      animation-duration: $md-ink-pulse-time;
+      animation-iteration-count: infinite;
+      animation-name: md-ink-pulse;
+      animation-timing-function: $md-transition-standard;
+    }
+
+    @keyframes md-ink-pulse {
+      0% {
+        transform: scale($md-ink-max-scale);
+      }
+
+      66% {
+        transform: scale($md-ink-min-scale);
+      }
+
+      100% {
+        transform: scale($md-ink-max-scale);
+      }
+    }
   }
 
   .md-ink--leaving {
     opacity: 0;
     transition-duration: .3s;
     transition-timing-function: $md-transition-deceleration;
-  }
-
-  @keyframes md-ink-pulse {
-    0% {
-      transform: scale(.9);
-    }
-
-    66% {
-      transform: scale(.85);
-    }
-
-    100% {
-      transform: scale(.9);
-    }
   }
 }
 

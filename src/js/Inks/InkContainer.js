@@ -282,7 +282,10 @@ export default class InkContainer extends PureComponent {
 
   _handleKeyDown(e) {
     const key = e.which || e.keyCode;
-    if (key === ENTER || key === SPACE) {
+    const role = e.target.getAttribute('role');
+    const enter = key === ENTER;
+    const space = key === SPACE;
+    if (space || (enter && (!role || (role !== 'checkbox' && role !== 'radio' && !e.target.querySelector('input'))))) {
       this._clicked = true;
       this.createInk();
       this._maybeDelayClick();

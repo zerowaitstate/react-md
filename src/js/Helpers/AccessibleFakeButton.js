@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { findDOMNode } from 'react-dom';
 import cn from 'classnames';
 import { TAB, ENTER, SPACE } from '../constants/keyCodes';
+import closest from '../utils/closest';
 
 /**
  * The `AccessibleFakeButton` is a generic component that can be used to render
@@ -90,6 +91,15 @@ export default class AccessibleFakeButton extends PureComponent {
      * @access private
      */
     ink: PropTypes.node,
+
+    /**
+     * Boolean if the fake button is emulating a form element or if there is a form element inside. If this
+     * is omitted, the Checkbox, Radio, and Switch components will automatically be considered form elements.
+     *
+     * If this prop is enabled, pressing the ENTER key will not trigger a click event, but instead it will
+     * trigger a form submit like the native element.
+     */
+    isFormElement: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -147,22 +157,31 @@ export default class AccessibleFakeButton extends PureComponent {
   }
 
   _handleKeyDown(e) {
-    if (this.props.disabled) {
+    const { disabled, onKeyDown, isFormElement, role } = this.props;
+    if (disabled) {
       return;
     }
 
-    if (this.props.onKeyDown) {
-      this.props.onKeyDown(e);
+    if (onKeyDown) {
+      onKeyDown(e);
     }
 
     const key = e.which || e.keyCode;
     const space = key === SPACE;
+    const enter = key === ENTER;
     if (space) {
       // prevent the page from scrolling
       e.preventDefault();
     }
 
-    if (key === ENTER || space) {
+    const isRoleFormElement = (typeof isFormElement === 'undefined' && (role === 'checkbox' || role === 'radio'));
+    if (enter && (isFormElement || isRoleFormElement)) {
+      const form = closest(e.target, 'form');
+      const submit = form ? form.querySelector('*[type="submit"]') : null;
+      if (submit) {
+        submit.click();
+      }
+    } else if (enter || space) {
       this._handleClick(e);
     }
   }
@@ -208,6 +227,7 @@ export default class AccessibleFakeButton extends PureComponent {
     delete props.onKeyUp;
     delete props.onKeyDown;
     delete props.onTabFocus;
+    delete props.isFormElement;
 
     let childElements = children;
     if (ink) {

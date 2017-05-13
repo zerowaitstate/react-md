@@ -11,6 +11,7 @@ const OrientationExamples = () => (
       id="appointment"
       label="Select an appointment date"
       className="md-cell"
+      readOnly
     />
     <DatePicker
       id="appointmentPortrait"

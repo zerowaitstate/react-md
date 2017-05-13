@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { DatePicker, TextField, SelectField, Button, SelectionControlGroup, SelectionControl } from 'react-md';
+
 import OrientationExamples from './OrientationExamples';
 import OrientationExamplesRaw from '!!raw!./OrientationExamples';
 
@@ -18,7 +20,33 @@ import ControlledExampleRaw from '!!raw!./ControlledExample';
 import FullyControlledExample from './FullyControlledExample';
 import FullyControlledExampleRaw from '!!raw!./FullyControlledExample';
 
+const items = ['', 'Woop', 'Shoop'];
+
+const Test = () => (
+  <form id="something" onSubmit={(e) => e.preventDefault()} className="md-grid">
+    <DatePicker id="form-pcker-1" label="Something" className="md-cell md-cell--12" />
+    <TextField id="some-text-field" label="Text Here" className="md-cell md-cell--12" />
+    <SelectField id="some-select-field" label="Wooop" menuItems={items} className="md-cell md-cell--12" position={SelectField.Positions.BELOW} />
+    <input type="radio" value="a" name="radio" />
+    <input type="radio" value="b" name="radio" />
+    <input type="radio" value="c" name="radio" />
+    <input type="checkbox" value="woop" id="checkbox" name="checkbox" />
+    <select id="some-navtive-select" name="native-select">
+      <option value="" />
+      <option value="something">Something</option>
+    </select>
+    <SelectionControlGroup id="control-radios" name="control-radios" type="radio" controls={[{ label: '', value: '' }, { label: 'What', value: 'a' }, { label: 'Who', value: 'b' }]} />
+    <SelectionControl id="somme-checkbox" name="some-checkbox" type="checkbox" value="fjkds" />
+    <Button id="reset" type="reset" label="Reset" secondary flat />
+    <Button id="submit-btn" type="submit" label="Submit" primary flat />
+  </form>
+);
+
 export default [{
+  title: 'Wop',
+  code: '',
+  children: <Test />,
+}, {
   title: 'Orientation Examples',
   description: `
 Date pickers will attempt to follow the correct display mode of the current
@@ -70,3 +98,4 @@ use cases for this. It's there though!
   code: FullyControlledExampleRaw,
   children: <FullyControlledExample />,
 }];
+

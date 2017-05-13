@@ -7,6 +7,7 @@ import isRequiredForA11y from 'react-prop-types/lib/isRequiredForA11y';
 
 import { UP, DOWN, ESC, ENTER, TAB, ZERO, NINE, KEYPAD_ZERO, KEYPAD_NINE } from '../constants/keyCodes';
 import getField from '../utils/getField';
+import isKeyboardClickable from '../utils/EventUtils/isKeyboardClickable';
 import controlled from '../utils/PropTypes/controlled';
 import isBetween from '../utils/NumberUtils/isBetween';
 import addSuffix from '../utils/StringUtils/addSuffix';
@@ -583,6 +584,21 @@ export default class SelectField extends PureComponent {
    * clicking it can either open or close it, this is actually toggled.
    */
   _toggleOpen(e) {
+    let isInForm = this._menu && this._menu.querySelector('input');
+    if (isInForm) {
+      isInForm = isInForm.form;
+    }
+
+    if (e.type === 'keydown' && !isKeyboardClickable(e, isInForm)) {
+      if (isInForm) {
+        const submitter = isInForm.querySelector('*[type="submit"]');
+        if (submitter) {
+          submitter.click();
+        }
+      }
+      return;
+    }
+
     const isOpen = !getField(this.props, this.state, 'isOpen');
     if (this.props.onMenuToggle) {
       this.props.onMenuToggle(isOpen, e);
@@ -713,7 +729,7 @@ export default class SelectField extends PureComponent {
       e.preventDefault();
     }
 
-    if (!isOpen && (key === DOWN || key === UP || key === ENTER)) {
+    if (!isOpen && (key === DOWN || key === UP)) {
       this._handleOpen(e);
       return;
     } else if (isOpen && (key === ESC || key === TAB)) {
