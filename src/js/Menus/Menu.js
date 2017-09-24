@@ -336,6 +336,38 @@ export default class Menu extends PureComponent {
      */
     fillViewportHeight: PropTypes.bool,
 
+    /**
+     * Boolean if the portal API should be used for rendering the child component. This is an
+     * advanced usage and can lead to some weird bugs if you are unfamiliar with the use cases.
+     *
+     * @see {@link Helpers/Portals}
+     * @see {@link #renderNode}
+     * @see {@link #lastChild}
+     */
+    portal: PropTypes.bool,
+
+    /**
+     * Boolean if the portal API should render as the last child instead of the first. This is only
+     * used if the `portal` prop is enabled.
+     *
+     * Enabling this prop will automatically disable the `simplified` menu placing logic.
+     *
+     * @see {@link #portal}
+     * @see {@link #lastChild}
+     * @see {@link Helpers/Portal#lastChild}
+     */
+    lastChild: PropTypes.bool,
+
+    /**
+     * An optional render node to use for the portal API. This is only used if the `portal` prop
+     * is enabled.
+     *
+     * @see {@link #portal}
+     * @see {@link #lastChild}
+     * @see {@link Helpers/Portal#renderNode}
+     */
+    renderNode: PropTypes.object,
+
     isOpen: deprecated(PropTypes.bool, 'Use `visible` instead'),
     close: deprecated(PropTypes.func, 'Use `onClose` instead'),
     autoclose: deprecated(PropTypes.bool, 'The menus will always autoclose as according to the specs'),
@@ -370,6 +402,8 @@ export default class Menu extends PureComponent {
     repositionOnScroll: true,
     repositionOnResize: false,
     simplified: true,
+    portal: false,
+    lastChild: false,
   };
 
   static contextTypes = {

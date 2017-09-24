@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { IdPropType, Props } from '../index';
+import { SharedPortalProps } from './Portal';
 
 export type toggleQueryFn = () => string;
 
@@ -25,7 +26,7 @@ export interface LayoverAnchor {
   y: VerticalAnchors;
 }
 
-export interface SharedLayoverProps extends Props {
+export interface SharedLayoverProps extends Props, SharedPortalProps {
   id?: IdPropType;
   style?: React.CSSProperties;
   className?: string;
@@ -49,6 +50,7 @@ export interface SharedLayoverProps extends Props {
   minBottom?: number | string;
   fillViewportHeight?: boolean;
   fillViewportWidth?: boolean;
+  portal?: boolean;
 }
 
 export interface LayoverProps extends SharedLayoverProps {

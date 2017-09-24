@@ -1,9 +1,11 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import cn from 'classnames';
 import {
   unmountComponentAtNode as unmount,
   unstable_renderSubtreeIntoContainer as render,
 } from 'react-dom';
+import TICK from '../constants/CSSTransitionGroupTick';
 
 /**
  * Creates a "Portal" for the children to be rendered in. Basically it will render the
@@ -55,23 +57,53 @@ export default class Portal extends PureComponent {
      * or `body` instead of the first.
      */
     lastChild: PropTypes.bool,
+
+    /**
+     * An optional transition name to use. This was based off of the original `CSSTransitionGroup`'s `transitionName`
+     * so it has the same ideologies. The transition name will be suffixed with:
+     * - `-enter` - once the `visible` prop has been switched to `true`
+     * - `-enter-active` - a render cycle after the `-enter` suffix was applied and for the duration of the
+     *   `transitionEnterTimeout`
+     * - `-leave` - once the `visible` prop has been switched to `false`
+     * - `-leave-active` - a render cycle after the `-leave` suffix was applied and for the duration of the
+     *   `transitionLeaveTimeout`
+     */
+    transitionName: PropTypes.string,
+
+    /**
+     * The duration that the enter transition takes to fully animate. To disable the enter transition,
+     * set this value to `0` or `null`.
+     */
+    transitionEnterTimeout: PropTypes.number,
+
+    /**
+     * The duration that the leave transition takes to fully animate. To disable the enter transition,
+     * set this value to `0` or `null`.
+     */
+    transitionLeaveTimeout: PropTypes.number,
   };
 
   static defaultProps = {
     component: 'span',
+    lastChild: false,
   };
+
+  state = { className: '' };
 
   componentDidMount() {
     if (this.props.visible) {
-      this._renderPortal(this.props);
+      this._renderPortal(this.props, this.state);
     }
   }
 
   componentWillReceiveProps(nextProps) {
     const { visible, onOpen } = nextProps;
-    if (this.props.visible === visible && this._container) {
-      // Need to just re-render the subtree
-      this._renderPortal(nextProps);
+    if (this.props.visible === visible) {
+      if (this._container) {
+        // Need to just re-render the subtree
+        this._renderPortal(nextProps, this.state);
+      }
+
       return;
     }
 
@@ -79,18 +111,73 @@ export default class Portal extends PureComponent {
       if (onOpen) {
         onOpen();
       }
-      this._renderPortal(nextProps);
+      this._renderPortal(nextProps, this.state);
+      this._animate(nextProps, true);
     } else {
-      this._removePortal();
+      this._animate(nextProps, false, this._removePortal);
+    }
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if (this.state.className !== nextState.className) {
+      this._renderPortal(nextProps, nextState);
     }
   }
 
   componentWillUnmount() {
-    this._removePortal();
+    // sort of hacky, just clear timeout and remove portal
+    this._animate({ transitionName: null }, false, this._removePortal);
   }
 
   _container = null;
   _portal = null;
+
+  /**
+   * This function is basically how the CSSTransitionGroup used to work at a TransitionItem level. It will attempt to
+   * clear any existing animation timeouts and then attempt to do the animation logic. If there is no transitionName,
+   * or timeout duration for the current animation type, it will not do any additional work and just shortcut out while
+   * calling the optional callback function. When there is a transitionName and a timeout duration, it will apply class
+   * names just like the CSSTransitionGroup of `-enter`, `-enter-active`, `-leave`, `-leave-active`.
+   *
+   * @param {Object} props - the props object to use to extract the transition parts.
+   * @param {boolean=true} enter - boolean if the animation should be entering versus leaving.
+   * @param {function=} callback - an optional callback to call when the animation has finished or immediately
+   *    if there is no animation active.
+   */
+  _animate = ({ transitionName, transitionEnterTimeout, transitionLeaveTimeout }, enter = true, callback) => {
+    if (this._timeout) {
+      clearTimeout(this._timeout);
+      this._timeout = null;
+    }
+
+    if (!transitionName || (enter && !transitionEnterTimeout) || (!enter && !transitionLeaveTimeout)) {
+      if (callback) {
+        callback();
+      }
+
+      if (this.state.className) {
+        this.setState({ className: '' });
+      }
+      return;
+    }
+
+    const suffix = enter ? 'enter' : 'leave';
+    const timeout = enter ? transitionEnterTimeout : transitionLeaveTimeout;
+    const className = `${transitionName}-${suffix}`;
+    this.setState({ className });
+    this._timeout = setTimeout(() => {
+      this.setState({ className: `${className} ${className}-active` });
+
+      this._timeout = setTimeout(() => {
+        this._timeout = null;
+        this.setState({ className: '' });
+
+        if (callback) {
+          callback();
+        }
+      }, timeout);
+    }, TICK);
+  };
 
   _applyStyles = (props) => {
     if (props.className) {
@@ -98,7 +185,7 @@ export default class Portal extends PureComponent {
     }
   };
 
-  _renderPortal = (props) => {
+  _renderPortal = (props, state) => {
     if (!this._container) {
       this._container = document.createElement(props.component);
 
@@ -113,7 +200,10 @@ export default class Portal extends PureComponent {
       this._applyStyles(props);
     }
 
-    this._portal = render(this, props.children, this._container);
+    const child = React.Children.only(props.children);
+    this._portal = render(this, React.cloneElement(child, {
+      className: cn(child.props.className, state.className),
+    }), this._container);
   };
 
   _removePortal = () => {

@@ -1,0 +1,16 @@
+@import '~globals';
+
+.virtualized__cell {
+  align-items: center;
+  display: flex;
+  padding: 6px 12px;
+
+  &--header {
+    background: $md-blue-grey-500;
+    color: $md-white-base;
+  }
+
+  &__list {
+    width: 0;
+  }
+}

@@ -328,6 +328,38 @@ export default class MenuButton extends PureComponent {
      */
     fillViewportHeight: PropTypes.bool,
 
+    /**
+     * Boolean if the portal API should be used for rendering the child component. This is an
+     * advanced usage and can lead to some weird bugs if you are unfamiliar with the use cases.
+     *
+     * Enabling this prop will automatically disable the `simplifiedMenu` placing logic.
+     *
+     * @see {@link Helpers/Portals}
+     * @see {@link #renderNode}
+     * @see {@link #lastChild}
+     */
+    portal: PropTypes.bool,
+
+    /**
+     * Boolean if the portal API should render as the last child instead of the first. This is only
+     * used if the `portal` prop is enabled.
+     *
+     * @see {@link #portal}
+     * @see {@link #lastChild}
+     * @see {@link Helpers/Portal#lastChild}
+     */
+    lastChild: PropTypes.bool,
+
+    /**
+     * An optional render node to use for the portal API. This is only used if the `portal` prop
+     * is enabled.
+     *
+     * @see {@link #portal}
+     * @see {@link #lastChild}
+     * @see {@link Helpers/Portal#renderNode}
+     */
+    renderNode: PropTypes.object,
+
     buttonChildren: deprecated(
       PropTypes.node,
       'To build a button, put any elements in the `children`. The `ListItem` have been moved to the `menuItems` prop'
@@ -341,6 +373,8 @@ export default class MenuButton extends PureComponent {
     defaultVisible: false,
     repositionOnScroll: true,
     repositionOnResize: false,
+    portal: false,
+    lastChild: false,
   };
 
   render() {
@@ -387,6 +421,9 @@ export default class MenuButton extends PureComponent {
       minBottom,
       fillViewportWidth,
       fillViewportHeight,
+      portal,
+      lastChild,
+      renderNode,
       isOpen, // deprecated
       defaultOpen, // deprecated
       onMenuToggle, // deprecated
@@ -440,6 +477,9 @@ export default class MenuButton extends PureComponent {
         transitionName={transitionName}
         transitionEnterTimeout={transitionEnterTimeout}
         transitionLeaveTimeout={transitionLeaveTimeout}
+        portal={portal}
+        lastChild={lastChild}
+        renderNode={renderNode}
         onVisibilityChange={onMenuToggle || onVisibilityChange}
       >
         <Button {...props} id={buttonId}>

@@ -163,6 +163,38 @@ export default class TablePagination extends PureComponent {
      */
     decrementIcon: PropTypes.element,
 
+    /**
+     * Boolean if the portal API should be used for rendering the child component. This is an
+     * advanced usage and can lead to some weird bugs if you are unfamiliar with the use cases.
+     *
+     * Enabling this prop will automatically disable the `simplifiedMenu` placing logic.
+     *
+     * @see {@link Helpers/Portals}
+     * @see {@link #renderNode}
+     * @see {@link #lastChild}
+     */
+    portal: PropTypes.bool,
+
+    /**
+     * Boolean if the portal API should render as the last child instead of the first. This is only
+     * used if the `portal` prop is enabled.
+     *
+     * @see {@link #portal}
+     * @see {@link #lastChild}
+     * @see {@link Helpers/Portal#lastChild}
+     */
+    lastChild: PropTypes.bool,
+
+    /**
+     * An optional render node to use for the portal API. This is only used if the `portal` prop
+     * is enabled.
+     *
+     * @see {@link #portal}
+     * @see {@link #lastChild}
+     * @see {@link Helpers/Portal#renderNode}
+     */
+    renderNode: PropTypes.object,
+
     incrementIconChildren: deprecated(PropTypes.node, 'Use the `incrementIcon` prop instead'),
     incrementIconClassName: deprecated(PropTypes.string, 'Use the `incrementIcon` prop instead'),
     decrementIconChildren: deprecated(PropTypes.node, 'Use the `decrementIcon` prop instead'),
@@ -185,6 +217,8 @@ export default class TablePagination extends PureComponent {
     incrementIcon: <FontIcon>keyboard_arrow_right</FontIcon>,
     decrementIcon: <FontIcon>keyboard_arrow_left</FontIcon>,
     simplifiedMenu: false,
+    portal: false,
+    lastChild: false,
   };
 
   constructor(props, context) {
@@ -321,6 +355,9 @@ export default class TablePagination extends PureComponent {
       incrementIcon,
       decrementIcon,
       simplifiedMenu,
+      portal,
+      lastChild,
+      renderNode,
 
       // deprecated
       incrementIconChildren,
@@ -382,6 +419,9 @@ export default class TablePagination extends PureComponent {
                 value={rowsPerPage}
                 onChange={this._setRowsPerPage}
                 simplifiedMenu={simplifiedMenu}
+                portal={portal}
+                lastChild={lastChild}
+                renderNode={renderNode}
               />
               <span className="md-table-pagination--label">{pagination}</span>
               <Button

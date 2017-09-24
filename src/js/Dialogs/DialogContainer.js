@@ -554,7 +554,7 @@ export default class DialogContainer extends PureComponent {
       isOpen,
       actionLeft,
       actionRight,
-      transitionName,
+      transitionName: propTransitionName,
       transitionEnter,
       transitionLeave,
       /* eslint-enable no-unused-vars */
@@ -577,6 +577,7 @@ export default class DialogContainer extends PureComponent {
       />
     );
 
+    const transitionName = `md-dialog--${fullPage ? 'full-page' : 'centered'}`;
     const container = (
       <CSSTransitionGroup
         component={component}
@@ -587,7 +588,7 @@ export default class DialogContainer extends PureComponent {
           'md-pointer--hover': !fullPage && overlay && !modal,
           'md-overlay--active': !fullPage && active && overlay,
         }, className)}
-        transitionName={`md-dialog--${fullPage ? 'full-page' : 'centered'}`}
+        transitionName={transitionName}
         transitionEnterTimeout={transitionEnterTimeout}
         transitionLeaveTimeout={transitionLeaveTimeout}
         tabIndex={-1}
@@ -602,7 +603,14 @@ export default class DialogContainer extends PureComponent {
     }
 
     return (
-      <Portal visible={portalVisible} renderNode={renderNode} lastChild={lastChild}>
+      <Portal
+        visible={portalVisible}
+        lastChild={lastChild}
+        renderNode={renderNode}
+        transitionName={transitionName}
+        transitionEnterTimeout={transitionEnterTimeout}
+        transitionLeaveTimeout={transitionLeaveTimeout}
+      >
         {container}
       </Portal>
     );

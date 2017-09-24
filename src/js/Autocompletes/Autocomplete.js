@@ -487,6 +487,38 @@ export default class Autocomplete extends PureComponent {
      * @see {@link TextFields#toolbar}
      */
     toolbar: PropTypes.bool,
+
+    /**
+     * Boolean if the portal API should be used for rendering the child component. This is an
+     * advanced usage and can lead to some weird bugs if you are unfamiliar with the use cases.
+     *
+     * Enabling this prop will automatically disable the `simplifiedMenu` placing logic.
+     *
+     * @see {@link Helpers/Portals}
+     * @see {@link #renderNode}
+     * @see {@link #lastChild}
+     */
+    portal: PropTypes.bool,
+
+    /**
+     * Boolean if the portal API should render as the last child instead of the first. This is only
+     * used if the `portal` prop is enabled.
+     *
+     * @see {@link #portal}
+     * @see {@link #lastChild}
+     * @see {@link Helpers/Portal#lastChild}
+     */
+    lastChild: PropTypes.bool,
+
+    /**
+     * An optional render node to use for the portal API. This is only used if the `portal` prop
+     * is enabled.
+     *
+     * @see {@link #portal}
+     * @see {@link #lastChild}
+     * @see {@link Helpers/Portal#renderNode}
+     */
+    renderNode: PropTypes.object,
   };
 
   static defaultProps = {
@@ -503,6 +535,8 @@ export default class Autocomplete extends PureComponent {
     repositionOnScroll: true,
     repositionOnResize: true,
     inlineSuggestionPadding: 6,
+    portal: false,
+    lastChild: false,
   };
 
   constructor(props) {
@@ -962,6 +996,9 @@ export default class Autocomplete extends PureComponent {
       minBottom,
       fillViewportWidth,
       fillViewportHeight,
+      portal,
+      lastChild,
+      renderNode,
       /* eslint-disable no-unused-vars */
       value: propValue,
       total,
@@ -1084,6 +1121,9 @@ export default class Autocomplete extends PureComponent {
         minBottom={minBottom}
         fillViewportWidth={fillViewportWidth}
         fillViewportHeight={fillViewportHeight}
+        portal={portal}
+        lastChild={lastChild}
+        renderNode={renderNode}
       >
         {matches.map(this._mapToListItem)}
       </Menu>

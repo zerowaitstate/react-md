@@ -4,6 +4,8 @@ import ExamplesPage from 'components/ExamplesPage';
 import README from './README.md';
 import SimpleOverlay from './SimpleOverlay';
 import SimpleOverlayRaw from '!!raw-loader!./SimpleOverlay.jsx';
+import AdvancedUsage from './AdvancedUsage';
+import AdvancedUsageRaw from './AdvancedUsage/code';
 
 const examples = [{
   title: 'Simple Overlay',
@@ -15,6 +17,10 @@ this example shows an example usage by creating an overlay.
   `,
   code: SimpleOverlayRaw,
   children: <SimpleOverlay />,
+}, {
+  title: 'Advanced Usage',
+  code: AdvancedUsageRaw,
+  children: <AdvancedUsage />,
 }];
 
 const Portals = () => <ExamplesPage description={README} examples={examples} />;

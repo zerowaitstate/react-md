@@ -1,14 +1,20 @@
 import * as React from 'react';
 import { Props } from '../index';
 
-export interface PortalProps extends Props {
+export interface SharedPortalProps {
+  renderNode?: Object;
+  lastChild?: boolean;
+  transitionName?: string;
+  transitionEnterTimeout?: number;
+  transitionLeaveTimeout?: number;
+}
+
+export interface PortalProps extends Props, SharedPortalProps {
   visible: boolean;
   children?: React.ReactElement<any>;
   component?: string;
   onOpen?: Function;
   onClose?: Function;
-  renderNode?: Object;
-  lastChild?: boolean;
 }
 
 declare const Portal: React.ComponentClass<PortalProps>;

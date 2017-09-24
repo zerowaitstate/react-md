@@ -16,6 +16,7 @@ import HorizontalAnchors from './HorizontalAnchors';
 import VerticalAnchors from './VerticalAnchors';
 import Positions from './Positions';
 import ResizeObserver from './ResizeObserver';
+import Portal from './Portal';
 
 /**
  * The Layover component is used to keep a component fixed to another component
@@ -332,6 +333,38 @@ export default class Layover extends PureComponent {
      * really need to be used much.
      */
     simplified: PropTypes.bool,
+
+    /**
+     * Boolean if the portal API should be used for rendering the child component. This is an
+     * advanced usage and can lead to some weird bugs if you are unfamiliar with the use cases.
+     *
+     * Enabling this prop will automatically disable the `simplified` placing logic.
+     *
+     * @see {@link Helpers/Portals}
+     * @see {@link #renderNode}
+     * @see {@link #lastChild}
+     */
+    portal: PropTypes.bool,
+
+    /**
+     * Boolean if the portal API should render as the last child instead of the first. This is only
+     * used if the `portal` prop is enabled.
+     *
+     * @see {@link #portal}
+     * @see {@link #lastChild}
+     * @see {@link Helpers/Portal#lastChild}
+     */
+    lastChild: PropTypes.bool,
+
+    /**
+     * An optional render node to use for the portal API. This is only used if the `portal` prop
+     * is enabled.
+     *
+     * @see {@link #portal}
+     * @see {@link #lastChild}
+     * @see {@link Helpers/Portal#renderNode}
+     */
+    renderNode: PropTypes.object,
   };
 
   static defaultProps = {
@@ -362,6 +395,8 @@ export default class Layover extends PureComponent {
     minBottom: 0,
     fillViewportWidth: false,
     fillViewportHeight: false,
+    portal: false,
+    lastChild: false,
   };
 
   constructor(props) {
@@ -391,13 +426,13 @@ export default class Layover extends PureComponent {
       });
     }
 
-    const { visible, fixedTo, sameWidth, centered, simplified } = this.props;
+    const { visible, fixedTo, sameWidth, centered, simplified, portal } = this.props;
     const anchor = this._getAnchor(this.props);
     if (visible) {
       handleWindowClickListeners(this._handleOutsideClick, true);
 
       // Don't worry about any of the other logic for a "simple" layover
-      if (simplified) {
+      if (simplified && !portal) {
         return;
       }
 
@@ -413,11 +448,13 @@ export default class Layover extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { fixedTo, visible, children, sameWidth, centered, simplified } = nextProps;
+    const { fixedTo, visible, children, sameWidth, centered } = nextProps;
+    const simplified = nextProps.simplified && !nextProps.portal;
     if (simplified) {
-      if (this.props.simplified !== simplified) {
+      if (simplified !== (this.props.simplified && !this.props.portal)) {
         this._reset();
       }
+
       return;
     }
 
@@ -477,7 +514,8 @@ export default class Layover extends PureComponent {
     }
     handleWindowClickListeners(this._handleOutsideClick, false);
 
-    if (!this.props.simplified) {
+    const simplified = this.props.simplified && !this.props.portal;
+    if (!simplified) {
       this._manageFixedToListener(this.props.fixedTo, false);
       this._manageWindowResizeListener(false);
     }
@@ -854,7 +892,8 @@ export default class Layover extends PureComponent {
         this._childComponent.ref(child);
       }
 
-      if (this.props.simplified || !this._child || (!this._toggle && !this._contextRect)) {
+      const simplified = this.props.simplified && !this.props.portal;
+      if (simplified || !this._child || (!this._toggle && !this._contextRect)) {
         return;
       }
 
@@ -1082,9 +1121,12 @@ export default class Layover extends PureComponent {
       children,
       fullWidth,
       animationPosition,
-      simplified,
       fillViewportWidth,
       fillViewportHeight,
+      portal,
+      lastChild,
+      renderNode,
+      simplified: propSimplified,
       /* eslint-disable no-unused-vars */
       anchor,
       belowAnchor,
@@ -1107,24 +1149,40 @@ export default class Layover extends PureComponent {
       ...props
     } = this.props;
 
-    let child;
+    const simplified = propSimplified && !portal;
+    const childEl = React.Children.only(children);
     let childId;
-    if (visible) {
-      child = React.Children.only(children);
-      if (child.props.id) {
-        childId = child.props.id;
-      } else if (props.id) {
-        childId = `${props.id}-layover`;
-      }
+    if (childEl.props.id) {
+      childId = childEl.props.id;
+    } else if (props.id) {
+      childId = `${props.id}-layover`;
+    }
 
+    let child;
+    if (visible || portal) {
       child = React.cloneElement(children, {
         ref: this._fixateChild,
         id: childId,
-        style: simplified ? child.props.style : this.state.styles,
+        style: simplified ? childEl.props.style : this.state.styles,
         className: cn(`md-layover-child md-layover-child--${animationPosition}`, {
           'md-layover-child--simplified': simplified,
-        }, child.props.className),
+        }, childEl.props.className),
       });
+
+      if (portal) {
+        child = (
+          <Portal
+            visible={visible}
+            lastChild={lastChild}
+            renderNode={renderNode}
+            transitionName={props.transitionName}
+            transitionEnterTimeout={props.transitionEnterTimeout}
+            transitionLeaveTimeout={props.transitionLeaveTimeout}
+          >
+            {child}
+          </Portal>
+        );
+      }
     }
 
     let observer = null;

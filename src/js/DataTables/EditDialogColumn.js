@@ -520,6 +520,38 @@ export default class EditDialogColumn extends PureComponent {
      */
     adjusted: PropTypes.bool,
 
+    /**
+     * Boolean if the portal API should be used for rendering the child component. This is an
+     * advanced usage and can lead to some weird bugs if you are unfamiliar with the use cases.
+     *
+     * Enabling this prop will automatically disable the `simplifiedDialog` placing logic.
+     *
+     * @see {@link Helpers/Portals}
+     * @see {@link #renderNode}
+     * @see {@link #lastChild}
+     */
+    portal: PropTypes.bool,
+
+    /**
+     * Boolean if the portal API should render as the last child instead of the first. This is only
+     * used if the `portal` prop is enabled.
+     *
+     * @see {@link #portal}
+     * @see {@link #lastChild}
+     * @see {@link Helpers/Portal#lastChild}
+     */
+    lastChild: PropTypes.bool,
+
+    /**
+     * An optional render node to use for the portal API. This is only used if the `portal` prop
+     * is enabled.
+     *
+     * @see {@link #portal}
+     * @see {@link #lastChild}
+     * @see {@link Helpers/Portal#renderNode}
+     */
+    renderNode: PropTypes.object,
+
     inlineIconChildren: deprecated(PropTypes.node, 'Use the `inlineIcon` prop instead'),
     inlineIconClassName: deprecated(PropTypes.string, 'Use the `inlineIcon` prop instead'),
     noIcon: deprecated(PropTypes.bool, 'Set the `inlineIcon` prop to `null` instead'),
@@ -556,6 +588,8 @@ export default class EditDialogColumn extends PureComponent {
     minRight: 0,
     minBottom: 0,
     visibleOnFocus: true,
+    portal: false,
+    lastChild: false,
   };
 
   static contextTypes = {
@@ -776,6 +810,9 @@ export default class EditDialogColumn extends PureComponent {
       minLeft,
       minRight,
       minBottom,
+      portal,
+      lastChild,
+      renderNode,
 
       // deprecated
       noIcon,
@@ -893,6 +930,9 @@ export default class EditDialogColumn extends PureComponent {
           transitionName={transitionName}
           transitionEnterTimeout={transitionEnterTimeout}
           transitionLeaveTimeout={transitionLeaveTimeout}
+          portal={portal}
+          lastChild={lastChild}
+          renderNode={renderNode}
         >
           {field}
         </EditDialog>
